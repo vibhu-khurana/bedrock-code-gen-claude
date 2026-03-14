@@ -33,17 +33,11 @@ Human: Write {language} code for the following instructions: {message}.
 
     # Convert the native request to JSON.
     request = json.dumps(native_request)
-    print(f'actual request to send to bedrock model {request}')
-    print("MODEL ID:", model_id)
-    print("REGION:", boto3.session.Session().region_name)
 
     try:
-        #bedrock = boto3.client("bedrock-runtime",region_name="us-east-1",config = botocore.config.Config(read_timeout=300, retries = {'max_attempts':3}))
         response = client.invoke_model(modelId=model_id, body=request)
-        print(f"Response from bedrock {response}")
         response_content = response["body"].read().decode("utf-8")
         response_data = json.loads(response_content)
-        print(f'actual response_data {response_data}')
         response_data = json.loads(response_content)
         code = response_data["content"][0]["text"].strip()
         return code
@@ -80,8 +74,6 @@ def lambda_handler(event, context):
             "statusCode": 400,
             "body": "Invalid request"
         }
-
-    print(message, language)
 
     generated_code = generate_code_using_bedrock(message, language)
 
